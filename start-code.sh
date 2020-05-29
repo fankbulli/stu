@@ -1,8 +1,8 @@
 cd `dirname $0`                 #进入根目录
 
 proj_home=$PWD                  #工程根目录
-img_output=${image}          #生成镜像标签
-appname=${name}                   #容器名称
+img_output= "stu"          #生成镜像标签
+appname="stu"                  #容器名称
 port=80                         #docker暴露端口
 
 #  mvn打包镜像
