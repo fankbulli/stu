@@ -25,6 +25,7 @@ public class WebFilter implements Filter {
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
         response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setContentType("text/javascript");
         chain.doFilter(req, response);
     }
 
