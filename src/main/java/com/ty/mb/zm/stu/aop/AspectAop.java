@@ -1,6 +1,7 @@
 package com.ty.mb.zm.stu.aop;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.api.R;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,12 +18,13 @@ import java.util.Map;
 @Aspect
 @Component
 public class AspectAop {
-    private static final Logger log=LoggerFactory.getLogger(AspectAop.class);
+    private static Logger log=LoggerFactory.getLogger(AspectAop.class);
 
-    @Pointcut("execution(public * com.ty.mb.zm.stu.controller.*.*(..))")
-    public void log(){}
-    @Around("log()")
-    public void doAround(ProceedingJoinPoint pjp) throws Throwable{
+    @Pointcut("execution (* com.ty.mb.zm.stu.controller..*.*(..))")
+    public void logaop(){}
+    @Around("logaop()")
+    public Object doAround(ProceedingJoinPoint pjp) throws Throwable{
+        Object result=null;
         try {
             long start=System.currentTimeMillis();
             log.info("================================进入方法==================================");
@@ -38,7 +40,7 @@ public class AspectAop {
             }
             log.info("方法名称-->{}", JSONObject.toJSONString(method.getName()));
             log.info("方法入参-->{}", JSONObject.toJSONString(map));
-            Object result =pjp.proceed(args);
+            result =pjp.proceed(args);
             log.info("方法返回-->{}",JSONObject.toJSONString(result));
             long end=System.currentTimeMillis();
             log.info("耗时：-->{}ms",end-start);
@@ -46,5 +48,6 @@ public class AspectAop {
             log.debug("================================出现异常==================================");
             log.debug(e.getMessage());
         }
+        return result;
     }
 }
