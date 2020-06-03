@@ -23,7 +23,7 @@ import java.util.List;
  */
 @SpringBootTest
 public class CodeGenerator {
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
         // 代码生成器
         AutoGenerator mpg = new AutoGenerator();
 
