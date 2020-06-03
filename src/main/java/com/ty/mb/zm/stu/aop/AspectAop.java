@@ -23,6 +23,10 @@ public class AspectAop {
     public void logaop() {
     }
 
+
+
+
+
     @Around("logaop()")
     public Object doAround(ProceedingJoinPoint pjp) throws Throwable {
         Object result = null;
