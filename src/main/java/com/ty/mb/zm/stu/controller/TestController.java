@@ -6,10 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.*;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,15 +24,23 @@ import java.util.Map;
 public class TestController {
     @ApiOperation(value = "获取hostname",tags = "测试前端控制器")
     @GetMapping("/host")
-    public Map host(){
-        Map<String,String> map=new HashMap<>();
+    public String host(){
+        String hostIP="";
         try {
-            map.put(InetAddress.getLocalHost().getHostName(),InetAddress.getLocalHost().getHostAddress());
-            map.put(Inet4Address.getLocalHost().getHostName(),Inet4Address.getLocalHost().getHostAddress());
-            map.put(Inet6Address.getLocalHost().getHostName(), Inet6Address.getLocalHost().getHostAddress());
-        } catch (UnknownHostException e) {
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            while (networkInterfaces.hasMoreElements()) {
+                NetworkInterface ni = (NetworkInterface) networkInterfaces.nextElement();
+                Enumeration<InetAddress> nias = ni.getInetAddresses();
+                while (nias.hasMoreElements()) {
+                    InetAddress ia = (InetAddress) nias.nextElement();
+                    if (!ia.isLinkLocalAddress() && !ia.isLoopbackAddress() && ia instanceof Inet4Address) {
+                        hostIP=ia.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException e) {
             e.printStackTrace();
         }
-        return map;
+        return hostIP;
     }
 }

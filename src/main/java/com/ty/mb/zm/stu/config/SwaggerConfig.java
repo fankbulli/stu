@@ -12,9 +12,9 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -46,15 +46,9 @@ public class SwaggerConfig {
      * @return
      */
     private ApiInfo apiInfo() {
-        String hostname="";
-        try {
-            hostname= InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
         return new ApiInfoBuilder()
                 .title("stu-swagger-api")
-                .description("http://"+hostname+":8080/v2/api-docs")
+                .description("http://"+host()+":8080/v2/api-docs")
                 .version("1.0.0")
                 .build();
     }
@@ -63,5 +57,24 @@ public class SwaggerConfig {
         ArrayList<ApiKey> apiKeys = new ArrayList<>();
         apiKeys.add(new ApiKey("token", "token", "header"));
         return apiKeys;
+    }
+    public static String host(){
+        String hostIP="";
+        try {
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            while (networkInterfaces.hasMoreElements()) {
+                NetworkInterface ni = (NetworkInterface) networkInterfaces.nextElement();
+                Enumeration<InetAddress> nias = ni.getInetAddresses();
+                while (nias.hasMoreElements()) {
+                    InetAddress ia = (InetAddress) nias.nextElement();
+                    if (!ia.isLinkLocalAddress() && !ia.isLoopbackAddress() && ia instanceof Inet4Address) {
+                        hostIP=ia.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        return hostIP;
     }
 }
