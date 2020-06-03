@@ -31,10 +31,11 @@ public class SwaggerConfig {
                 .select()
                 // 方法需要有ApiOperation注解才能生存接口文档
                 .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
+
                 // 路径使用any风格
                 .paths(PathSelectors.any())
-                .build()
                 // 如何保护我们的Api，有三种验证（ApiKey, BasicAuth, OAuth）
+                .build()
                 .securitySchemes(security())
                 // 接口文档的基本信息
                 .apiInfo(apiInfo());
@@ -49,7 +50,7 @@ public class SwaggerConfig {
         return new ApiInfoBuilder()
                 .title("stu-swagger-api")
                 .description("http://"+host()+":8080/v2/api-docs")
-                .version("1.0.0")
+                .version("2.0.0")
                 .build();
     }
 
