@@ -6,7 +6,7 @@ appname=stu                   #ÈÝÆ÷Ãû³Æ
 port=80                         #docker±©Â¶¶Ë¿Ú
 
 #  mvn´ò°ü¾µÏñ
-docker run  --rm doc--name my-maven-project \
+docker run  --rm \
             -v /root/.m2:/root/.m2 \
             -v "$PWD":/usr/local/maven \
             -w /usr/local/maven maven:3.5.0-jdk-8-alpine mvn clean install
