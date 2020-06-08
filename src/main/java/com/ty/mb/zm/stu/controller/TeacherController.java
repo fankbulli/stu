@@ -34,10 +34,10 @@ public class TeacherController {
         return list;
     }
 
-    @ApiOperation(value = "根据sno查找教师",tags = "教师表")
-    @GetMapping("/findBySno/{sno}")
-    public Teacher findBySno(@PathVariable Integer sno){
-        Teacher tea=teacherService.getById(sno);
+    @ApiOperation(value = "根据tno查找教师",tags = "教师表")
+    @GetMapping("/findBySno/{tno}")
+    public Teacher findBySno(@PathVariable Integer tno){
+        Teacher tea=teacherService.getById(tno);
         return tea;
     }
 }
