@@ -7,8 +7,8 @@ port=80                         #docker暴露端口
 
 #  mvn打包镜像
 docker run  --rm doc--name my-maven-project \
-            -v /root/.m2:/root/.m2
-            -v "$PWD":/usr/local/maven
+            -v /root/.m2:/root/.m2 \
+            -v "$PWD":/usr/local/maven \
             -w /usr/local/maven maven:3.5.0-jdk-8-alpine mvn clean install
 # 获得docker容器 id和镜像 id
 r_c=`docker ps -a | grep "$appname" | awk '{print $1 }'`
