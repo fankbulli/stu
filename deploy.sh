@@ -1,45 +1,39 @@
-#!/usr/bin/env bash
-#编译+部署项目站点
+cd `dirname $0`                 #进入根目录
 
-#需要配置如下参数
-# 项目路径, 在Execute Shell中配置项目路径, pwd 就可以获得该项目路径
-# export PROJ_PATH=这个jenkins任务在部署机器上的路径
+mvn_p="maven:3.3.3-jdk-8"
+proj_home=$PWD                  #工程根目录
+img_output="school"             #生成镜像标签
+appname="stu"                   #容器名称
+port=80                         #docker暴露端口
 
-# 输入你的环境上tomcat的全路径
-# export TOMCAT_APP_PATH=tomcat在部署机器上的路径
+#  mvn打包镜像
+docker run  --rm \
+            --name doc\
+            -v /root/.m2:/root/.m2 \
+            -v "$PWD":/usr/src/mymaven \
+            -w /usr/src/mymaven $mvn_p mvn clean install
+# 获得docker容器 id和镜像 id
+r_c=`docker ps -a | grep "$appname" | awk '{print $1 }'`
+c=`docker ps -a | grep "$appname" | awk '{print $1 }'`
+r_img=`docker images | grep "$appname" | awk '{print $3 }'`
+# 如果容器正在运行，停止它
+if [ "$r_c"x != ""x ]; then
+   docker stop "$r_c"
+fi
+# 删除容器
+if [ "$c"x != ""x ]; then
+   docker rm "$c"
+fi
+# 删除镜像
+if [ "$r_img"x != ""x ]; then
+    docker rmi "$r_img"
+fi
 
-### base 函数
-killTomcat()
-{
-    #pid=`ps -ef|grep tomcat|grep java|awk '{print $2}'`
-    #echo "tomcat Id list :$pid"
-    #if [ "$pid" = "" ]
-    #then
-    #  echo "no tomcat pid alive"
-    #else
-    #  kill -9 $pid
-    #fi
-    #上面注释的或者下面的
-    cd $TOMCAT_APP_PATH/bin
-    sh shutdown.sh
-}
-cd $PROJ_PATH/my-scrum
-mvn clean install
+# 生成镜像
+docker build -t $img_output .
+# 日志目录
+mkdir -p $PWD/logs
+chmod 777 $PWD/logs
 
-# 停tomcat
-killTomcat
-
-# 删除原有工程
-rm -rf $TOMCAT_APP_PATH/webapps/ROOT
-rm -f $TOMCAT_APP_PATH/webapps/ROOT.war
-rm -f $TOMCAT_APP_PATH/webapps/my-scrum.war
-
-# 复制新的工程到tomcat上
-cp $PROJ_PATH/scrum/target/order.war $TOMCAT_APP_PATH/webapps/
-
-cd $TOMCAT_APP_PATH/webapps/
-mv my-scrum.war ROOT.war
-
-# 启动Tomcat
-cd $TOMCAT_APP_PATH/
-sh bin/startup.sh
+# 启动镜像  8080为工程的端口
+docker run -d --name $appname -p $port:8080 $img_output
