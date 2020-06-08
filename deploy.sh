@@ -7,7 +7,7 @@ appname="stu"                   #ÈÝÆ÷Ãû³Æ
 port=80                         #docker±©Â¶¶Ë¿Ú
 
 #  mvn´ò°ü¾µÏñ
-docker run  --rm  --name doc  -v /root/.m2:/root/.m2   -v $PWD:/usr/src/mymaven  -w /usr/src/mymaven $mvn_p mvn clean install
+docker run  --rm  --name doc  -v /root/.m2:/root/.m2   -v $proj_home:/usr/src/mymaven  -w /usr/src/mymaven "maven:3.3.3-jdk-8" mvn clean install
 # »ñµÃdockerÈÝÆ÷ idºÍ¾µÏñ id
 r_c=`docker ps -a | grep "$appname" | awk '{print $1 }'`
 c=`docker ps -a | grep "$appname" | awk '{print $1 }'`
