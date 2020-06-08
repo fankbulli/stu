@@ -1,15 +1,16 @@
 cd `dirname $0`                 #进入根目录
 
+mvn_p="maven:3.3.3-jdk-8"
 proj_home=$PWD                  #工程根目录
-img_output=school         #生成镜像标签
-appname=stu                   #容器名称
+img_output="school"             #生成镜像标签
+appname="stu"                   #容器名称
 port=80                         #docker暴露端口
 
 #  mvn打包镜像
 docker run  --rm \
             -v /root/.m2:/root/.m2 \
-            -v "$PWD":/usr/local/maven \
-            -w /usr/local/maven maven:3.5.0-jdk-8-alpine mvn clean install
+            -v $proj_home:/usr/src/mymaven \
+            -w /usr/src/mymaven $mvn_p mvn clean install
 # 获得docker容器 id和镜像 id
 r_c=`docker ps -a | grep "$appname" | awk '{print $1 }'`
 c=`docker ps -a | grep "$appname" | awk '{print $1 }'`
