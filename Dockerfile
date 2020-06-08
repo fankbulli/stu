@@ -1,6 +1,6 @@
 FROM fabric8/java-jboss-openjdk8-jdk
 
-ADD targer/*.jar app.jar
+ADD target/*.jar app.jar
 
 VOLUME /tmp
 
