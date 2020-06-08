@@ -1,62 +1,37 @@
-#!/bin/bash
-cd `dirname $0`
+cd `dirname $0`                 #进入根目录
 
-img_mvn="maven:3.3.3-jdk-8"                 # docker image of maven
-m2_cache=~/.m2                              # the local maven cache dir
-proj_home=$PWD                              # the project root dir
-img_output="school"      # output image tag
+proj_home=$PWD                  #工程根目录
+img_output=school         #生成镜像标签
+appname=stu                   #容器名称
+port=80                         #docker暴露端口
 
-git pull  https://github.com/fankbulli/stu.git # should use git clone https://name:pwd@xxx.git
+#  mvn打包镜像
+docker run  --rm doc--name my-maven-project \
+            -v /root/.m2:/root/.m2
+            -v "$PWD":/usr/local/maven
+            -w /usr/local/maven maven:3.5.0-jdk-8-alpine mvn clean install
+# 获得docker容器 id和镜像 id
+r_c=`docker ps -a | grep "$appname" | awk '{print $1 }'`
+c=`docker ps -a | grep "$appname" | awk '{print $1 }'`
+r_img=`docker images | grep "$appname" | awk '{print $3 }'`
+# 如果容器正在运行，停止它
+if [ "$r_c"x != ""x ]; then
+    docker stop "$r_c"
+fi
+# 删除容器
+if [ "$c"x != ""x ]; then
+    docker rm "$c"
+fi
+# 删除镜像
+if [ "$r_img"x != ""x ]; then
+    docker rmi "$r_img"
+fi
 
-echo "use docker maven"
-docker run --rm \
-   -v $m2_cache:/root/.m2 \
-   -v $proj_home:/usr/local/maven \
-   -w /usr/local/maven $img_mvn mvn clean package -U
-
-sudo mv $proj_home/stu/target/stu-*.jar $proj_home/stu/target/demo.jar # 兼容所有sh脚本
+# 生成镜像
 docker build -t $img_output .
-
+# 日志目录
 mkdir -p $PWD/logs
 chmod 777 $PWD/logs
 
-# 删除容器
-docker rm -f school
-
-#删除无效镜像
-echo "======== docker rmi containers ========"
-logs=$(docker images | grep none | awk '{print $3}')
-for log in $logs
-        do
-             echo $log
-	     docker rmi $log
-        done
-echo "删除成功"
-
-version=`date "+%Y%m%d%H"`
-spring_datasource_url=jdbc:mysql://192.168.101.53/school?useUnicode=true\&characterEncoding=utf-8\&useSSL=false\&serverTimezone=Asia/Shanghai\&autoReconnect=true\&allowMultiQueries=true
-
-# 启动镜像
-docker run -d --restart=on-failure:5 --privileged=true \
-    -w /home \
-    --net=host \
-    -v $PWD/logs:/home/logs \
-    --name school school \
-    java \
-        -Duser.timezone=Asia/Shanghai \
-        -XX:+PrintGCDateStamps \
-        -XX:+PrintGCTimeStamps \
-        -XX:+PrintGCDetails \
-        -XX:+HeapDumpOnOutOfMemoryError \
-        -Xloggc:logs/gc_$version.log \
-        -jar /home/demo.jar \
-#          --spring.profiles.active=dev \
-#          --spring.application.name=school \
-#          --eureka.client.serviceUrl.defaultZone=http://ip:port/eureka \
-          --spring.datasource.url=$spring_datasource_url \
-          --spring.datasource.username=root \
-          --spring.datasource.password=root \
-#          --xxl.job.admin.addresses=http://localhost:8090/job/ \
-#          --mq.namesrvAddr=ip:port \
-#          --cache.host=ip \
-#          --cache.port=port \
+# 启动镜像  8080为工程的端口
+docker run -d --name $appname -p $port:8080 $img_output
