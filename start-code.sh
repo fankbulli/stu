@@ -6,7 +6,7 @@ appname=stu                   #容器名称
 port=80                         #docker暴露端口
 
 #  mvn打包镜像
-docker run  --rm doc--name my-maven-project \
+sudo docker run  --rm doc--name my-maven-project \
             -v /root/.m2:/root/.m2 \
             -v "$PWD":/usr/local/maven \
             -w /usr/local/maven maven:3.5.0-jdk-8-alpine mvn clean install
@@ -16,22 +16,22 @@ c=`docker ps -a | grep "$appname" | awk '{print $1 }'`
 r_img=`docker images | grep "$appname" | awk '{print $3 }'`
 # 如果容器正在运行，停止它
 if [ "$r_c"x != ""x ]; then
-    docker stop "$r_c"
+   sudo docker stop "$r_c"
 fi
 # 删除容器
 if [ "$c"x != ""x ]; then
-    docker rm "$c"
+   sudo docker rm "$c"
 fi
 # 删除镜像
 if [ "$r_img"x != ""x ]; then
-    docker rmi "$r_img"
+   sudo docker rmi "$r_img"
 fi
 
 # 生成镜像
-docker build -t $img_output .
+sudo docker build -t $img_output .
 # 日志目录
 mkdir -p $PWD/logs
 chmod 777 $PWD/logs
 
 # 启动镜像  8080为工程的端口
-docker run -d --name $appname -p $port:8080 $img_output
+sudo docker run -d --name $appname -p $port:8080 $img_output
